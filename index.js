@@ -13,12 +13,14 @@ app.engine('hbs', hbs.engine({
     defaultLayout: 'main',
     layoutsDir: __dirname+'/views/layouts'
 }))
+
 // setup static public directory
 app.use(express.static('public'));
 
 const mysql = require('mysql')
 
 const bodyParser = require('body-parser')
+const {request} = require("express");
 app.use(bodyParser.urlencoded({extended: true}))
 
 //create database connection
@@ -32,6 +34,19 @@ var con = mysql.createConnection({
 con.connect(function(err){
     if (err) throw err;
     console.log('connected to joga_mysql db')
+})
+
+//show all articles / index page
+app.get('/', (req,res) => {
+    let query = "SELECT * FROM article";
+    let articles = []
+    con.query(query, (err, result) => {
+        if (err) throw err
+        articles = result
+        res.render('index', {
+            articles: articles
+        })
+    })
 })
 
 // app start point
