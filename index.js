@@ -20,7 +20,6 @@ app.use(express.static('public'));
 const mysql = require('mysql')
 
 const bodyParser = require('body-parser')
-const {request} = require("express");
 app.use(bodyParser.urlencoded({extended: true}))
 
 //create database connection
@@ -38,7 +37,7 @@ con.connect(function(err){
 
 //show all articles / index page
 app.get('/', (req,res) => {
-    let query = "SELECT * FROM article";
+    let query = "SELECT * FROM article ";
     let articles = []
     con.query(query, (err, result) => {
         if (err) throw err
@@ -51,13 +50,12 @@ app.get('/', (req,res) => {
 
 //show article by this slug
 app.get('/article/:slug', (req,res) => {
-    let query = `SELECT * FROM article WHERE slug="${req.params.slug}"`
-    let article
+    let query = `SELECT article.id as 'id', article.slug as 'slug', article.image as 'image', article.body as 'body', article.published as 'published', author.name as 'author' FROM article INNER JOIN author ON article.author_id = author.id WHERE slug = '${req.params.slug}'`
+
     con.query(query, (err, result) => {
         if (err) throw err
-        article = result
         res.render('article', {
-            article: article
+            article: result
         })
     })
 })
